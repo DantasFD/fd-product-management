@@ -64,8 +64,6 @@ function App() {
                   <Route exact path="/" component={CreateProduct} />
                   <Route path="/create-product" component={CreateProduct} />
                   <Route path="/create-brand" component={CreateBrand} />
-                  <Route path="/edit-product/:id" component={EditProduct} />
-                  <Route path="/product-list" component={ProductList} />
                 </Switch>
               </div>
             </Col>

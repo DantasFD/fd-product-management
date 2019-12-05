@@ -27,26 +27,28 @@ export default class CreateProduct extends Component {
     this.state = {
       name: "",
       description: "",
-      price: 0.0,
+      price: 0,
       brands: [],
+      selectedBrand: {},
       fabricationDate: new Date(),
       warrantyExpireDate: new Date()
     };
   }
 
   componentDidMount() {
-    fetch("https://localhost:44397/brand")
-      .then(function(response) {
-        if (response.status >= 400) {
-          throw new Error("Bad response from server");
-        }
-        return response.json();
-      })
-      .then(function(data) {
-        this.setState({ brands: data.response });
-      });
-
-    console.log("Retorno da API", this.state.brands);
+    fetch('https://localhost:44397/brand', {
+      // mode: 'no-cors',
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    }, ).then(response => {
+      if (response.ok) {
+        response.json().then(json => {
+          this.setState({ brands: json });
+        });
+      }
+    });
   }
 
   onChangeProductName(e) {
@@ -59,10 +61,6 @@ export default class CreateProduct extends Component {
 
   onChangeProductPrice(e) {
     this.setState({ price: e.target.value });
-  }
-
-  onChangeProductBrand(e) {
-    this.setState({ brands: e.target.value });
   }
 
   onChangeProductFabricationDate(e) {
@@ -86,13 +84,14 @@ export default class CreateProduct extends Component {
   };
 
   handleBrandChange = e => {
-    this.setState({ [e.target.name]: e.target.value });
+    this.setState({ selectedBrand: JSON.parse(e.target.value) });
+    console.log("Valores", this.state.selectedBrand);
   };
 
   createOptions = () =>
     this.state.brands.length
       ? this.state.brands.map(data => (
-          <option key={data.id} value={data.name}>
+          <option key={data.id} value={data}>
             {data.name}
           </option>
         ))
@@ -105,12 +104,14 @@ export default class CreateProduct extends Component {
       name: this.state.name,
       description: this.state.description,
       price: this.state.price,
-      brand: this.state.brands,
+      brand: this.state.selectedBrand,
       fabricationDate: this.state.fabricationDate,
       warrantyExpireDate: this.state.warrantyExpireDate
     };
 
-    fetch("https://localhost:44397/brand", {
+    console.log("Objeto PRoducto", ProductObject);
+
+    fetch("https://localhost:44397/product", {
       method: "post",
       headers: {
         "content-Type": "application/json; charset=utf-8"
@@ -118,9 +119,10 @@ export default class CreateProduct extends Component {
       body: JSON.stringify({
         name: ProductObject.name,
         description: ProductObject.description,
-        price: ProductObject.price,
+        price: ProductObject.Price,
         fabricationDate: ProductObject.fabricationDate,
-        warrantyExpireDate: ProductObject.warrantyExpireDate
+        warrantyExpireDate: ProductObject.warrantyExpireDate,
+        brand: ProductObject.brand
       })
     }).then(response => {
       console.log(response);
@@ -129,9 +131,9 @@ export default class CreateProduct extends Component {
     this.setState({
       name: "",
       description: "",
-      price: "",
-      fabricationDate: "",
-      warrantyExpireDate: ""
+      price: 0,
+      fabricationDate: new Date(),
+      warrantyExpireDate: new Date()
     });
   }
 
